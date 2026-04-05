@@ -4,8 +4,8 @@ services:
   # ============================================================================
   neo4j:
     image: neo4j:5.15.0-community
+    platform: linux/amd64
     container_name: exam-neo4j
-    platform: linux/arm64
     ports:
       - "7475:7474" # HTTP (different port to avoid conflict with other Neo4j instances)
       - "7688:7687" # Bolt (different port to avoid conflict)
@@ -22,7 +22,11 @@ services:
     networks:
       - exam-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5

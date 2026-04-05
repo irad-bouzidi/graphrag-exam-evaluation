@@ -8,9 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import structlog
 
-from src.config import settings
-from src.core.database import neo4j_connection
-from src.core.exceptions import (
+from config import settings
+from core.database import neo4j_connection
+from core.exceptions import (
     ExamNotFoundError,
     StudentNotFoundError,
     SubmissionNotFoundError,
@@ -182,7 +182,7 @@ async def api_root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "src.main:app",
+        "main:app",
         host="0.0.0.0",
         port=settings.api_port,
         reload=settings.debug

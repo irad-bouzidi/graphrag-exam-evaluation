@@ -4,7 +4,7 @@ Script to seed the database with sample data for testing
 import asyncio
 from datetime import datetime
 import structlog
-from app.core.database import neo4j_connection
+from src.core.database import neo4j_connection
 
 logger = structlog.get_logger()
 
