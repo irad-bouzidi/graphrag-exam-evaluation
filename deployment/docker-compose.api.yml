@@ -1,0 +1,50 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: exam-api
+    platform: linux/arm64
+    ports:
+      - "8083:8083"
+    env_file:
+      - .env
+    environment:
+      - NEO4J_URI=bolt://exam-neo4j:7687
+      - NEO4J_USER=${NEO4J_USER:-neo4j}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-exam-secure-password-2024}
+      - NEO4J_DATABASE=${NEO4J_DATABASE:-neo4j}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE:-0.2}
+      - OPENAI_EMBEDDING_MODEL=${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      - EMBEDDING_DIMENSIONS=${EMBEDDING_DIMENSIONS:-1536}
+      - LANGSMITH_TRACING=${LANGSMITH_TRACING:-true}
+      - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT:-https://api.smith.langchain.com}
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-graphrag-exam-evaluation}
+      - API_HOST=${API_HOST:-0.0.0.0}
+      - API_PORT=${API_PORT:-8083}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3004,http://localhost:3000}
+      - GRADE_LEVEL=${GRADE_LEVEL:-6}
+      - PASSING_SCORE=${PASSING_SCORE:-50.0}
+    volumes:
+      - exam_uploads:/app/uploads
+    networks:
+      - exam-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8083/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+networks:
+  exam-network:
+    external: true
+    name: exam-network
+
+volumes:
+  exam_uploads:
