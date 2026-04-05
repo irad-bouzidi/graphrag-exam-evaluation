@@ -1,0 +1,43 @@
+services:
+  # ============================================================================
+  # DATABASE: Neo4j Graph Database
+  # ============================================================================
+  neo4j:
+    image: neo4j:5.15.0-community
+    platform: linux/amd64
+    container_name: exam-neo4j
+    ports:
+      - "7475:7474" # HTTP (different port to avoid conflict with other Neo4j instances)
+      - "7688:7687" # Bolt (different port to avoid conflict)
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-exam-secure-password-2024}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*
+      - NEO4J_server_memory_pagecache_size=512M
+      - NEO4J_server_memory_heap_max__size=1G
+    volumes:
+      - exam_neo4j_data:/data
+      - exam_neo4j_logs:/logs
+    networks:
+      - exam-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+networks:
+  exam-network:
+    driver: bridge
+    name: exam-network
+
+volumes:
+  exam_neo4j_data:
+  exam_neo4j_logs:

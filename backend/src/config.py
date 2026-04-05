@@ -8,31 +8,22 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 def find_env_file() -> Path:
     """
-    Find .env file with better logic for your structure:
-    - backend/.env          (recommended location)
-    - .env in project root
-    - .env in current working directory
+    Find .env file in multiple locations.
+    Checks: current dir, backend/, project root (parent of backend/)
     """
-    # Start from the directory of this settings file (backend/src/)
-    src_dir = Path(__file__).parent          # backend/src/
-    backend_dir = src_dir.parent             # backend/
-    project_root = backend_dir.parent        # project root (if you have one)
-
     possible_paths = [
-        backend_dir / ".env",           # Best: .env right in backend/
-        project_root / ".env",          # Project root
-        Path.cwd() / ".env",            # Current working directory
-        Path(".env"),                   # Relative to cwd
-        src_dir / ".env",               # Inside src/ (unlikely)
+        Path(".env"),  # Current working directory
+        Path("backend/.env"),  # Backend directory (when running from root)
+        Path("../.env"),  # Parent directory (when running from backend/)
+        Path(__file__).parent.parent.parent / ".env",  # Project root relative to this file
     ]
 
     for path in possible_paths:
-        if path.exists() and path.is_file():
-            print(f"✅ Found .env at: {path.resolve()}", file=sys.stderr)
+        if path.exists():
             return path
 
-    print("⚠️  No .env file found. Will rely on environment variables only.", file=sys.stderr)
-    return Path(".env")  # fallback
+    # Default to .env in current directory (will fail gracefully if not found)
+    return Path(".env")
 
 
 class Settings(BaseSettings):
@@ -77,7 +68,7 @@ class Settings(BaseSettings):
 
     # API Configuration
     api_host: str = "0.0.0.0"
-    api_port: int = 8083
+    api_port: int = 8000
     api_workers: int = 4
     log_level: str = "info"
     debug: bool = True  # Enable debug mode (shows docs)

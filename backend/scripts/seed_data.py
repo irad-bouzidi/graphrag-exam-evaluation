@@ -4,7 +4,9 @@ Script to seed the database with sample data for testing
 import asyncio
 from datetime import datetime
 import structlog
-from src.core.database import neo4j_connection
+import sys
+sys.path.insert(0, '/home/irad/workspace/graphrag-exam-evaluation/backend/src')
+from core.database import neo4j_connection
 
 logger = structlog.get_logger()
 

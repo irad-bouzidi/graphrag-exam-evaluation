@@ -365,7 +365,7 @@ class ExamExtractorService:
         if not self.neo4j:
             raise AIServiceError("Neo4j connection required to create exam")
         
-        from src.services.exam_service import ExamService
+        from services.exam_service import ExamService
         
         service = ExamService(self.neo4j)
         

@@ -8,6 +8,9 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
+# Only copy what exists
+RUN cp -r .next/static .next/standalone/.next/
+
 ENV PORT=3000
 EXPOSE 3000
 
