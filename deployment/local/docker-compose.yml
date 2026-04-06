@@ -7,8 +7,8 @@ services:
     platform: linux/amd64
     container_name: exam-neo4j
     ports:
-      - "7475:7474" # HTTP (different port to avoid conflict with other Neo4j instances)
-      - "7688:7687" # Bolt (different port to avoid conflict)
+      - "7475:7474" # HTTP (Neo4j Browser)
+      - "7688:7687" # Bolt
     environment:
       - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-exam-secure-password-2024}
       - NEO4J_PLUGINS=["apoc"]
@@ -31,6 +31,27 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    restart: unless-stopped
+
+  # ============================================================================
+  # VISUALIZATION: NeoDash - Interactive dashboards for Neo4j
+  # ============================================================================
+  neodash:
+    image: neo4jlabs/neodash:2.4.11
+    container_name: exam-neodash
+    ports:
+      - "5005:5005" # NeoDash web UI (you can change the host port if needed)
+    environment:
+      - NEO4J_URI=bolt://neo4j:7688
+      - NEO4J_USER=${NEO4J_USER:-neo4j}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-exam-secure-password-2024}
+      # Optional: Pre-load a dashboard (create one in NeoDash and mount it)
+      # - DASHBOARD_FILE=/dashboards/default.json
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    networks:
+      - exam-network
     restart: unless-stopped
 
 networks:
