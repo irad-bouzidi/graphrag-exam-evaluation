@@ -77,7 +77,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3004,http://localhost:3000"
 
     # Neo4j Configuration (non-secret parts)
-    neo4j_uri: str = "bolt://localhost:7688"
+    neo4j_uri: str = "bolt://localhost:7687"
     neo4j_user: str = "neo4j"
     neo4j_database: str = "neo4j"
 
