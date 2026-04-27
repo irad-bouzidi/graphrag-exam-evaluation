@@ -87,14 +87,14 @@ class ExamExtractorService:
     LangChain-powered agent for extracting exam structure from OCR text.
     Uses structured prompts with JSON schema enforcement.
     """
-
+    
     def __init__(self):
         self.llm = ChatOpenAI(
             model="gpt-5-nano",
             temperature=1,  # Reasoning models require temperature=1
             model_kwargs={"max_completion_tokens": 16000}
         )
-
+    
     async def extract_exam_from_text(self, ocr_text: str) -> Dict:
         messages = [
             SystemMessage(content="You are an expert at analyzing exam documents..."),
@@ -105,7 +105,6 @@ class ExamExtractorService:
 ```
 
 **Key Capabilities:**
-
 - Extracts questions, answers, metadata from raw OCR text
 - Identifies question types (calculation, word_problem, geometry, etc.)
 - Maps questions to mathematical skills and topics
@@ -120,11 +119,11 @@ class MathCorrectionService:
     - SymPy for exact mathematical comparison
     - LangChain for semantic analysis and partial credit
     """
-
+    
     async def correct_question(self, question, student_answer):
         # Step 1: Try exact mathematical comparison with SymPy
         is_correct = await self._compare_math_answers(student_answer, correct_answer)
-
+        
         if not is_correct:
             # Step 2: Use AI agent for detailed analysis
             ai_correction = await self._ai_correct_question(question, student_answer)
@@ -132,7 +131,6 @@ class MathCorrectionService:
 ```
 
 **Correction Pipeline:**
-
 1. **Exact Match**: Direct string comparison
 2. **Numeric Evaluation**: Float comparison with tolerance
 3. **Algebraic Equivalence**: SymPy symbolic math comparison
@@ -182,7 +180,7 @@ Questions are embedded using OpenAI's `text-embedding-3-small` model and stored 
 
 ```python
 # Vector index creation
-CREATE VECTOR INDEX question_embedding IF NOT EXISTS
+CREATE VECTOR INDEX question_embedding IF NOT EXISTS 
 FOR (q:Question) ON (q.embedding)
 OPTIONS {
     indexConfig: {
@@ -193,7 +191,6 @@ OPTIONS {
 ```
 
 **Use Cases:**
-
 - Find similar questions across exams
 - Identify knowledge gaps by clustering wrong answers
 - Recommend practice questions based on student weaknesses
@@ -310,18 +307,18 @@ INDEX question_embedding FOR (q:Question) ON (q.embedding) // Vector index
 
 The AI agent identifies specific error patterns:
 
-| Error Type            | Description                               |
-| --------------------- | ----------------------------------------- |
-| `calculation_error`   | Wrong arithmetic operations               |
-| `conceptual_error`    | Misunderstanding of mathematical concepts |
-| `procedural_error`    | Wrong method or approach                  |
-| `careless_mistake`    | Small slip, but understands concept       |
-| `incomplete_answer`   | Missing parts of the solution             |
-| `unit_error`          | Wrong or missing units                    |
-| `sign_error`          | Positive/negative mistakes                |
-| `decimal_error`       | Decimal point misplaced                   |
-| `fraction_error`      | Fraction calculation errors               |
-| `order_of_operations` | PEMDAS/BODMAS violations                  |
+| Error Type | Description |
+|------------|-------------|
+| `calculation_error` | Wrong arithmetic operations |
+| `conceptual_error` | Misunderstanding of mathematical concepts |
+| `procedural_error` | Wrong method or approach |
+| `careless_mistake` | Small slip, but understands concept |
+| `incomplete_answer` | Missing parts of the solution |
+| `unit_error` | Wrong or missing units |
+| `sign_error` | Positive/negative mistakes |
+| `decimal_error` | Decimal point misplaced |
+| `fraction_error` | Fraction calculation errors |
+| `order_of_operations` | PEMDAS/BODMAS violations |
 
 ### LangGraph Integration (Future Enhancement)
 
@@ -363,19 +360,16 @@ workflow.add_edge("feedback_generator", END)
 ### Setup
 
 1. Clone the repository:
-
 ```bash
 cd graphrag-exam-evaluation
 ```
 
 2. Copy environment file:
-
 ```bash
 cp .env.example .env
 ```
 
 3. Configure `.env` with your OpenAI credentials:
-
 ```env
 OPENAI_API_KEY=your-api-key
 OPENAI_MODEL=gpt-5-nano
@@ -384,20 +378,17 @@ OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 ```
 
 4. Start Neo4j first (separate container):
-
 ```bash
 docker-compose -f docker-compose.neo4j.yml up -d
 ```
 
 5. Wait for Neo4j to be healthy, then start the API:
-
 ```bash
 docker-compose -f docker-compose.api.yml build --no-cache api
 docker-compose -f docker-compose.api.yml up -d
 ```
 
 Or use the Makefile shortcuts:
-
 ```bash
 make neo4j-up          # Start Neo4j
 make api-up            # Start API (after Neo4j is ready)
@@ -405,10 +396,9 @@ make docker-up         # Start both (Neo4j then API)
 ```
 
 6. Access the application:
-
-- Frontend: http://localhost:3000 (run `cd frontend && npm run dev`)
-- API Docs: http://localhost:8000/docs
-- Neo4j Browser: http://localhost:7474 (note: different port to avoid conflicts)
+- Frontend: http://localhost:3004 (run `cd frontend && npm run dev`)
+- API Docs: http://localhost:8083/docs
+- Neo4j Browser: http://localhost:7475 (note: different port to avoid conflicts)
 
 ### Docker Commands
 
@@ -433,13 +423,11 @@ make docker-down      # Stop all services
 ## API Endpoints
 
 ### Health
-
 - `GET /api/health` - Basic health check
 - `GET /api/health/ready` - Readiness check with dependencies
 - `GET /api/health/stats` - System statistics
 
 ### Exams
-
 - `POST /api/exams` - Create an exam
 - `GET /api/exams` - List exams
 - `GET /api/exams/{id}` - Get exam details
@@ -448,7 +436,6 @@ make docker-down      # Stop all services
 - `POST /api/exams/upload` - Upload exam template (OCR)
 
 ### Students
-
 - `POST /api/students` - Create a student
 - `POST /api/students/bulk` - Bulk create students
 - `GET /api/students` - List students
@@ -459,7 +446,6 @@ make docker-down      # Stop all services
 - `GET /api/students/class/{class}/statistics` - Get class statistics
 
 ### Submissions
-
 - `POST /api/submissions` - Create a submission
 - `POST /api/submissions/upload` - Upload scanned submission
 - `GET /api/submissions` - List submissions
@@ -470,7 +456,6 @@ make docker-down      # Stop all services
 - `POST /api/submissions/batch/correct` - Batch correct submissions
 
 ### Graph
-
 - `GET /api/graph/overview` - Graph structure overview
 - `GET /api/graph/visualization` - Graph data for visualization
 - `GET /api/graph/student/{id}` - Student-centered graph
@@ -491,13 +476,13 @@ make docker-down      # Stop all services
 
 ## Grade 6 Math Topics
 
-| Topic                    | Skills                                                                                                 |
-| ------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Topic | Skills |
+|-------|--------|
 | **Numbers & Operations** | Addition, subtraction, multiplication, division, decimals, fractions, percentages, order of operations |
-| **Geometry**             | Perimeter, area, volume, angles, shapes, symmetry, coordinates                                         |
-| **Measurement**          | Length, mass, capacity, time, unit conversion, temperature                                             |
-| **Problem Solving**      | Word problems, multi-step problems, reasoning, estimation, patterns                                    |
-| **Ratios & Proportions** | Ratios, proportions, scale, rates                                                                      |
+| **Geometry** | Perimeter, area, volume, angles, shapes, symmetry, coordinates |
+| **Measurement** | Length, mass, capacity, time, unit conversion, temperature |
+| **Problem Solving** | Word problems, multi-step problems, reasoning, estimation, patterns |
+| **Ratios & Proportions** | Ratios, proportions, scale, rates |
 
 ## Development
 
@@ -519,20 +504,20 @@ npm run dev
 
 ## Environment Variables
 
-| Variable                 | Description          | Default                  |
-| ------------------------ | -------------------- | ------------------------ |
-| `OPENAI_API_KEY`         | OpenAI API key       | Required                 |
-| `OPENAI_MODEL`           | LLM model to use     | `gpt-5-nano`             |
-| `OPENAI_TEMPERATURE`     | Model temperature    | `0.2`                    |
-| `OPENAI_EMBEDDING_MODEL` | Embedding model      | `text-embedding-3-small` |
-| `EMBEDDING_DIMENSIONS`   | Vector dimensions    | `1536`                   |
-| `NEO4J_URI`              | Neo4j connection URI | `bolt://localhost:7687`  |
-| `NEO4J_USER`             | Neo4j username       | `neo4j`                  |
-| `NEO4J_PASSWORD`         | Neo4j password       | Required                 |
-| `API_PORT`               | API server port      | `8083`                   |
-| `CORS_ORIGINS`           | Allowed CORS origins | `http://localhost:3004`  |
-| `GRADE_LEVEL`            | Default grade level  | `6`                      |
-| `PASSING_SCORE`          | Passing percentage   | `50.0`                   |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `OPENAI_API_KEY` | OpenAI API key | Required |
+| `OPENAI_MODEL` | LLM model to use | `gpt-5-nano` |
+| `OPENAI_TEMPERATURE` | Model temperature | `0.2` |
+| `OPENAI_EMBEDDING_MODEL` | Embedding model | `text-embedding-3-small` |
+| `EMBEDDING_DIMENSIONS` | Vector dimensions | `1536` |
+| `NEO4J_URI` | Neo4j connection URI | `bolt://localhost:7687` |
+| `NEO4J_USER` | Neo4j username | `neo4j` |
+| `NEO4J_PASSWORD` | Neo4j password | Required |
+| `API_PORT` | API server port | `8083` |
+| `CORS_ORIGINS` | Allowed CORS origins | `http://localhost:3004` |
+| `GRADE_LEVEL` | Default grade level | `6` |
+| `PASSING_SCORE` | Passing percentage | `50.0` |
 
 ## Project Structure
 
